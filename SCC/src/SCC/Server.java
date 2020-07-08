@@ -19,6 +19,7 @@ public class Server {
     public static String Sessionkey1;
     public static String SessionKey2;
     public static int legal_flag;
+    public static String Sessionkey_com;
     
     public static void connecting() 
     {
@@ -247,6 +248,41 @@ public class Server {
     	
     	
     }
+    public static void connect2() {
+int port = DEFAULT_PORT+2;
+        
+        
+        
+        ServerSocket serverSocket = null;
+
+        try {
+            serverSocket = new ServerSocket(port);            
+            Socket newSock  = null;
+            Boolean stop = true;
+            Boolean end = true;
+            while(stop == true) { 
+            	System.out.println("Server TCP ready at the port: " + port + "..." );
+
+                //Waiting for the connection with the client
+                newSock = serverSocket.accept(); 
+                while(end == true){
+                	System.out.println("success connect");
+                    BufferedReader is = new BufferedReader(new InputStreamReader(newSock.getInputStream()));
+                    PrintWriter os = new PrintWriter(newSock.getOutputStream(), true); 
+                    String inputLine = is.readLine(); 
+                    System.out.println("Received DeviceID: " + inputLine);
+                    os.println("ok");
+                	os.flush(); 
+                	 
+                	//stop = false;
+                	//end = false;
+                }}}
+               
+        catch (IOException e) {
+            System.err.println("Error2 " + e);
+        }
+    	
+}
     // end main
     public static void main(String[] args) throws IOException{
     	connecting();
@@ -254,5 +290,32 @@ public class Server {
     	connecting1();
     	System.out.println("sessionkey1: "+Sessionkey1+" Sessionkey2: "+SessionKey2);
     	System.out.println("ok");
+    	int ses1=Integer.valueOf(Sessionkey1);
+    	int ses2=Integer.valueOf(SessionKey2);
+    	System.out.println("ses1: "+Sessionkey1+" ses2: "+SessionKey2);
+    	int com_sessionkey=ses1|ses2;
+    	int quotient1 = 0;//商數
+		  String output_server = " "; 
+		  
+		  //計算結果
+		  for(int n2 = 1; n2 <= 4; n2++ )//計算每四個字元要空白
+		  {
+		   for(int i2 = 1; i2 <= 4 ; i2 ++)
+		   {
+		     int remainder1 = com_sessionkey % 2;//餘數
+		     quotient1 = com_sessionkey / 2 ;
+		     com_sessionkey = quotient1;
+		     output_server = remainder1 + output_server;  
+		   }  
+		  
+		  output_server =" " + output_server;//印出空白
+		  }
+		  Sessionkey_com = output_server;
+		  System.out.println(Sessionkey_com);
+    	int n;
+    	
+    		connect2();
+    		
+    	
     }
 }

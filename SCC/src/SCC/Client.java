@@ -25,6 +25,7 @@ public class Client{
     public static int aug2;
     public static String clientchallenge;
     public static int legal_flag;
+    public static String Sessionkey_com;
     public static void connect() throws IOException
     {
         try
@@ -265,6 +266,64 @@ public class Client{
                 e.printStackTrace();
             }
         }}
+    public static void connect2() {
+    	try
+        {	
+            String host = "localhost";
+            int port = 5032;
+            InetAddress address = InetAddress.getByName(host);
+            socket = new Socket(address, port);
+            OutputStream os = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os);
+            BufferedWriter bw = new BufferedWriter(osw);
+            
+            Scanner in = new Scanner(System.in);
+            String s="";
+            System.out.println("enter");
+            
+            while(!s.equals("END")){
+            	s=in.nextLine();
+            String sendMessage = s + "\n";
+            bw.write(sendMessage);
+            bw.flush();
+            
+            
+            InputStream is = socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            String message = br.readLine();
+            System.out.println("Message received from the server : " +message);
+        }
+        }
+  		
+        
+        catch (Exception exception)
+        {
+            exception.printStackTrace();
+        }
+        
+        finally
+        {
+            //Closing the socket
+            try
+            {
+                socket.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+    	}
+
+    	
+
+
+
+    	
+    	
+    
     
     public static void main(String[] args) throws IOException{
     	connect();
@@ -273,7 +332,34 @@ public class Client{
     	int ses2=Integer.valueOf(SessionKey2);
     	System.out.println("ses1: "+SessionKey+" ses2: "+SessionKey2);
     	int com_sessionkey=ses1|ses2;
+    	
+    	int quotient1 = 0;//商數
+		  String output_server = " "; 
+		  
+		  //計算結果
+		  for(int n2 = 1; n2 <= 4; n2++ )//計算每四個字元要空白
+		  {
+		   for(int i2 = 1; i2 <= 4 ; i2 ++)
+		   {
+		     int remainder1 = com_sessionkey % 2;//餘數
+		     quotient1 = com_sessionkey / 2 ;
+		     com_sessionkey = quotient1;
+		     output_server = remainder1 + output_server;  
+		   }  
+		  
+		  output_server =" " + output_server;//印出空白
+		  }
+		  Sessionkey_com = output_server;
+		  System.out.println(Sessionkey_com);
+    	
+    	int n;
     	if(legal_flag==1)
-    	{System.out.println("Authentication ok");}
+    	{System.out.println("Authentication ok");
+    	n=2;
+    	
+    		
+    	}
+    	connect2();
+    	
     }
 }
