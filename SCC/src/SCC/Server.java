@@ -20,6 +20,7 @@ public class Server {
     public static String SessionKey2;
     public static int legal_flag;
     public static String Sessionkey_com;
+    public static int counter;
     
     public static void connecting() 
     {
@@ -260,8 +261,9 @@ int port = DEFAULT_PORT+2;
             Socket newSock  = null;
             Boolean stop = true;
             Boolean end = true;
+            int temp_k=0;
             while(stop == true) { 
-            	System.out.println("Server TCP ready at the port: " + port + "..." );
+            	//System.out.println("Server TCP ready at the port: " + port + "..." );
 
                 //Waiting for the connection with the client
                 newSock = serverSocket.accept(); 
@@ -270,12 +272,40 @@ int port = DEFAULT_PORT+2;
                     BufferedReader is = new BufferedReader(new InputStreamReader(newSock.getInputStream()));
                     PrintWriter os = new PrintWriter(newSock.getOutputStream(), true); 
                     String inputLine = is.readLine(); 
-                    System.out.println("Received DeviceID: " + inputLine);
-                    os.println("ok");
+                  //  System.out.println("Received message: " + inputLine);
+                   // String decrypted_message=AESM.decrypt(inputLine,Sessionkey_com);
+                    System.out.println(inputLine);
+                    String decrypted_message=AESM.decrypt(inputLine, Sessionkey_com);
+                    System.out.println(decrypted_message);
+                    String regex = "\\d*";
+                    Pattern p = Pattern.compile(regex);
+                    int n=0;
+                    Matcher m = p.matcher(decrypted_message);
+                    int[] x;
+                    x=new int[10];
+                    String[] y;
+                    y=new String[10];
+                    while (m.find()) {
+                        if (!"".equals(m.group()))
+                        //System.out.println("come here:" + m.group());
+                       
+                        y[n]=m.group();
+                        n=n+1;
+                        }
+                    int temp=Integer.valueOf(y[0]);
+                    if(temp_k==temp) {counter--;}
+                    temp_k=temp;
+                    temp=temp-1;
+                    String flag_temp=Integer.toString(temp);
+                    String message="ok"+" "+flag_temp;
+                    message=AESM.encrypt(message, Sessionkey_com);
+                    System.out.printf("Communication times left: %d",temp);
+                    System.out.printf("\n");
+                    os.println(message);
                 	os.flush(); 
-                	 
-                	//stop = false;
-                	//end = false;
+                	 if(temp==1)
+                	{stop = false;
+                	end = false;}
                 }}}
                
         catch (IOException e) {

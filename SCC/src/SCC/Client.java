@@ -14,6 +14,7 @@ import java.util.Scanner;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.sql.Timestamp;
 
 public class Client{
  
@@ -26,6 +27,7 @@ public class Client{
     public static String clientchallenge;
     public static int legal_flag;
     public static String Sessionkey_com;
+    public static int counter=3;
     public static void connect() throws IOException
     {
         try
@@ -279,20 +281,53 @@ public class Client{
             
             Scanner in = new Scanner(System.in);
             String s="";
-            System.out.println("enter");
-            
-            while(!s.equals("END")){
+            System.out.println("After authentication,communication start!");
+            int n=4;
+            while(n!=0){
+            	System.out.println("Message to send");
             	s=in.nextLine();
-            String sendMessage = s + "\n";
-            bw.write(sendMessage);
-            bw.flush();
-            
+            	String temp_n=Integer.toString(n);
+                String sendMessage = temp_n + " "+s+"\n";
+                String encrypted_message=AESM.encrypt(sendMessage, Sessionkey_com)+"\n";
+                bw.write(encrypted_message);
+                bw.flush();
+                //Timestamp d = new Timestamp(System.currentTimeMillis());
+                long d=System.currentTimeMillis();
+                System.out.println(d);
             
             InputStream is = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             String message = br.readLine();
             System.out.println("Message received from the server : " +message);
+            long d2=System.currentTimeMillis();
+            System.out.println(d2);
+            if((d2-d)>3000) {counter--;}
+            
+            String decrypted_message=AESM.decrypt(message, Sessionkey_com);
+            System.out.println(decrypted_message);
+            String regex = "\\d*";
+            Pattern p = Pattern.compile(regex);
+            int x=0;
+            Matcher m = p.matcher(decrypted_message);
+            
+            String[] y;
+            y=new String[10];
+            //取字串中的數字
+            while (m.find()) {
+            if (!"".equals(m.group()))
+            	//System.out.println("come here:" + m.group());
+            y[x]=m.group();
+            x=x+1;
+            }
+            //System.out.println(y[3]);
+           
+            int temp=Integer.valueOf(y[3]);
+            temp=temp-1;
+            n=temp;
+            System.out.printf("Communication times left: %d",n);
+            System.out.printf("\n");
+            
         }
         }
   		
@@ -352,14 +387,14 @@ public class Client{
 		  Sessionkey_com = output_server;
 		  System.out.println(Sessionkey_com);
     	
-    	int n;
+    	
     	if(legal_flag==1)
     	{System.out.println("Authentication ok");
-    	n=2;
-    	
     		
     	}
     	connect2();
+    	System.out.println("session end");
+    	if(counter==0) {System.out.println("not to change");}
     	
     }
 }
