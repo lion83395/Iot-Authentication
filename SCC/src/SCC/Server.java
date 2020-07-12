@@ -319,7 +319,8 @@ int port = DEFAULT_PORT+2;
     	
     	connecting1();
     	System.out.println("sessionkey1: "+Sessionkey1+" Sessionkey2: "+SessionKey2);
-    	System.out.println("ok");
+    	System.out.println("Authentication done");
+    	System.out.println("===============================");
     	int ses1=Integer.valueOf(Sessionkey1);
     	int ses2=Integer.valueOf(SessionKey2);
     	System.out.println("ses1: "+Sessionkey1+" ses2: "+SessionKey2);
@@ -341,11 +342,12 @@ int port = DEFAULT_PORT+2;
 		  output_server =" " + output_server;//印出空白
 		  }
 		  Sessionkey_com = output_server;
-		  System.out.println(Sessionkey_com);
+		 // System.out.println(Sessionkey_com);
     	int n;
     	
     		connect2();
-    		
+    		System.out.println("Session end");
+    		System.out.println("===============================");
     	
     }
 }

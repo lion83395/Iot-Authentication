@@ -293,7 +293,7 @@ public class Client{
                 bw.flush();
                 //Timestamp d = new Timestamp(System.currentTimeMillis());
                 long d=System.currentTimeMillis();
-                System.out.println(d);
+                //System.out.println(d);
             
             InputStream is = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
@@ -301,7 +301,7 @@ public class Client{
             String message = br.readLine();
             System.out.println("Message received from the server : " +message);
             long d2=System.currentTimeMillis();
-            System.out.println(d2);
+            //System.out.println(d2);
             if((d2-d)>3000) {counter--;}
             
             String decrypted_message=AESM.decrypt(message, Sessionkey_com);
@@ -385,15 +385,17 @@ public class Client{
 		  output_server =" " + output_server;//印出空白
 		  }
 		  Sessionkey_com = output_server;
-		  System.out.println(Sessionkey_com);
+		 // System.out.println(Sessionkey_com);
     	
     	
     	if(legal_flag==1)
     	{System.out.println("Authentication ok");
+    	System.out.println("===============================");
     		
     	}
     	connect2();
     	System.out.println("session end");
+    	System.out.println("===============================");
     	if(counter==0) {System.out.println("not to change");}
     	
     }
