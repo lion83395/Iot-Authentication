@@ -327,6 +327,10 @@ public class Client{
             n=temp;
             System.out.printf("Communication times left: %d",n);
             System.out.printf("\n");
+            if(n==0) {
+            	bw.write("over");
+                bw.flush();
+            }
             
         }
         }

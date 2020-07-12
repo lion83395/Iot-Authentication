@@ -303,7 +303,9 @@ int port = DEFAULT_PORT+2;
                     System.out.printf("\n");
                     os.println(message);
                 	os.flush(); 
-                	 if(temp==1)
+                	int flag;
+                	flag=message.compareTo("over");
+                	 if(flag==0)
                 	{stop = false;
                 	end = false;}
                 }}}
