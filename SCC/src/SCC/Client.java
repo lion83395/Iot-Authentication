@@ -400,7 +400,13 @@ public class Client{
     	connect2();
     	System.out.println("session end");
     	System.out.println("===============================");
-    	if(counter==0) {System.out.println("not to change");}
+    	if(counter!=0) {
+    		AES.change();
+    		System.out.println("Change complete");
+    	}
+    	else {
+    		System.out.println("Do not change");
+    	}
     	
     }
 }
