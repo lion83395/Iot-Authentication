@@ -7,6 +7,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +25,57 @@ public class Server {
     public static int legal_flag;
     public static String Sessionkey_com;
     public static int counter;
-    
+    public static long q[]=new long[7];
+    private static long transDec2(String in) {
+	    try {
+	        long out = Long.valueOf(in,16).intValue();
+	        return out;
+	    }catch (Exception e){
+	        return Long.valueOf(0);
+	    }
+	}
+    public static void database() {
+    	try {
+  	      Class.forName("com.mysql.jdbc.Driver");     //載入MYSQL JDBC驅動程式   
+  	      //Class.forName("org.gjt.mm.mysql.Driver");     System.out.println("Success loading Mysql Driver!");
+  	    }
+  	    catch (Exception e) {
+  	      System.out.print("Error loading Mysql Driver!");
+  	      e.printStackTrace();
+  	    }
+  	    try {
+  	      Connection connect = DriverManager.getConnection(
+  	          "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC","root","123456");
+  	           //連線URL為   jdbc:mysql//伺服器地址/資料庫名  ，後面的2個引數分別是登陸使用者名稱和密碼
+  	      //System.out.println("Success connect Mysql server!");
+  	      Statement stmt = connect.createStatement();
+  	      ResultSet rs = stmt.executeQuery("select * from user");
+  	      int num=0;
+  	      String key[]=new String[7];
+  	      String temp[]=new String[7];
+  	      while (rs.next()) {
+  	        //System.out.println(rs.getString("password"));
+  	        key[num]=rs.getString("password");
+  	        num++;
+  	      }
+  	    for(int i=0;i<num;i++) {
+	    		temp[i]=key[i].substring(8,12);
+	    	}
+  	    
+  	    for (int j=0;j<num;j++) {
+  	    	q[j]=transDec2(temp[j]); 	    	
+  	    }
+  	    
+  	    
+  	    
+  	    
+  	    }
+  	    	
+  	     catch (Exception e) {
+  	      System.out.print("get data error!");
+  	      e.printStackTrace();
+  	    }
+    }
     public static void connecting() 
     {
         int port = DEFAULT_PORT;
@@ -40,22 +94,11 @@ public class Server {
 
         try {
             serverSocket = new ServerSocket(port);
-            File file = new File("C:\\\\Users\\\\Yosoro\\\\OneDrive\\\\桌面\\\\test.txt");
-    		Scanner scanner = new Scanner(file);
-    		String str[] = new String[7];
-    		int num=0;
-    		while (scanner.hasNext()) 
-             {
-                  
-                  str[num] = scanner.next();		//字串分割 存入陣列
-                  num++;
-                  
-             }
-    		scanner.close();
-            int pw1=Integer.valueOf(str[0]);
-            int pw2=Integer.valueOf(str[1]);
-            int pw3=Integer.valueOf(str[2]);
-            int pw4=Integer.valueOf(str[3]);
+            
+    		int pw1=(int)q[0];
+            int pw2=(int)q[1];
+            int pw3=(int)q[2];
+            int pw4=(int)q[3];
             int[] pw= {0,pw1,pw2,pw3,pw4};
             Socket newSock    = null;
             Boolean stop = true;
@@ -317,8 +360,8 @@ int port = DEFAULT_PORT+2;
 }
     // end main
     public static void main(String[] args) throws IOException{
+    	database();
     	connecting();
-    	
     	connecting1();
     	System.out.println("sessionkey1: "+Sessionkey1+" Sessionkey2: "+SessionKey2);
     	System.out.println("Authentication done");

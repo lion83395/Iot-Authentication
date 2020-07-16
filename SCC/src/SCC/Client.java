@@ -10,10 +10,15 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Timestamp;
 
 public class Client{
@@ -28,6 +33,57 @@ public class Client{
     public static int legal_flag;
     public static String Sessionkey_com;
     public static int counter=3;
+    public static long q[]=new long[7];
+    private static long transDec2(String in) {
+	    try {
+	        long out = Long.valueOf(in,16).intValue();
+	        return out;
+	    }catch (Exception e){
+	        return Long.valueOf(0);
+	    }
+	}
+    public static void database() {
+    	try {
+  	      Class.forName("com.mysql.jdbc.Driver");     //載入MYSQL JDBC驅動程式   
+  	      //Class.forName("org.gjt.mm.mysql.Driver");     System.out.println("Success loading Mysql Driver!");
+  	    }
+  	    catch (Exception e) {
+  	      System.out.print("Error loading Mysql Driver!");
+  	      e.printStackTrace();
+  	    }
+  	    try {
+  	      Connection connect = DriverManager.getConnection(
+  	          "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC","root","123456");
+  	           //連線URL為   jdbc:mysql//伺服器地址/資料庫名  ，後面的2個引數分別是登陸使用者名稱和密碼
+  	      //System.out.println("Success connect Mysql server!");
+  	      Statement stmt = connect.createStatement();
+  	      ResultSet rs = stmt.executeQuery("select * from user");
+  	      int num=0;
+  	      String key[]=new String[7];
+  	      String temp[]=new String[7];
+  	      while (rs.next()) {
+  	        //System.out.println(rs.getString("password"));
+  	        key[num]=rs.getString("password");
+  	        num++;
+  	      }
+  	    for(int i=0;i<num;i++) {
+	    		temp[i]=key[i].substring(8,12);
+	    	}
+  	    
+  	    for (int j=0;j<num;j++) {
+  	    	q[j]=transDec2(temp[j]); 	    	
+  	    }
+  	    
+  	    
+  	    
+  	    
+  	    }
+  	    	
+  	     catch (Exception e) {
+  	      System.out.print("get data error!");
+  	      e.printStackTrace();
+  	    }
+    }
     public static void connect() throws IOException
     {
         try
@@ -36,19 +92,11 @@ public class Client{
             int port = 5030;
             InetAddress address = InetAddress.getByName(host);
             socket = new Socket(address, port);
-            File file = new File("C:\\\\Users\\\\Yosoro\\\\OneDrive\\\\桌面\\\\test.txt");
-			Scanner scanner = new Scanner(file);
-			String str[] = new String[7];
-			int num=0;
-			while (scanner.hasNext()) 
-	         {	              
-	              str[num] = scanner.next();		//字串分割 存入陣列
-	              num++;	              
-	         }
-            int pw1=Integer.valueOf(str[0]);
-            int pw2=Integer.valueOf(str[1]);
-            int pw3=Integer.valueOf(str[2]);
-            int pw4=Integer.valueOf(str[3]);
+            
+            int pw1=(int)q[0];
+            int pw2=(int)q[1];
+            int pw3=(int)q[2];
+            int pw4=(int)q[3];
             int[] pw= {0,pw1,pw2,pw3,pw4};
             String DeviceID="552";
             OutputStream os = socket.getOutputStream();
@@ -183,10 +231,10 @@ public class Client{
               
          }
         
-        int pw1=Integer.valueOf(str[0]);
-        int pw2=Integer.valueOf(str[1]);
-        int pw3=Integer.valueOf(str[2]);
-        int pw4=Integer.valueOf(str[3]);
+		int pw1=(int)q[0];
+        int pw2=(int)q[1];
+        int pw3=(int)q[2];
+        int pw4=(int)q[3];
         int[] pw= {0,pw1,pw2,pw3,pw4};
             String host = "localhost";
             int port = 5031;
@@ -298,11 +346,16 @@ public class Client{
             InputStream is = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
-            String message = br.readLine();
-            System.out.println("Message received from the server : " +message);
-            long d2=System.currentTimeMillis();
+            String message="";
+          long d2=System.currentTimeMillis();
             //System.out.println(d2);
-            if((d2-d)>3000) {counter--;}
+            if((d2-d)>3000) {counter--;break;}
+           
+            	message = br.readLine();
+            	
+            
+            System.out.println("Message received from the server : " +message);
+            
             
             String decrypted_message=AESM.decrypt(message, Sessionkey_com);
             System.out.println(decrypted_message);
@@ -356,17 +409,13 @@ public class Client{
 
     	}
 
-    	
-
-
-
-    	
-    	
-    
-    
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException{
+    	database();
+    	long startTime=System.currentTimeMillis(); 
     	connect();
     	connect1();
+    	long endTime=System.currentTimeMillis(); 
+    	System.out.println("程式執行時間：" +(endTime-startTime)+"ms"); 
     	int ses1=Integer.valueOf(SessionKey);
     	int ses2=Integer.valueOf(SessionKey2);
     	System.out.println("ses1: "+SessionKey+" ses2: "+SessionKey2);

@@ -8,6 +8,10 @@ import java.util.Scanner;
 import java.lang.String;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.io.FileWriter;
 import java.math.*;
@@ -23,63 +27,51 @@ public class AES {
 	        return Long.valueOf(0);
 	    }
 	}
-	public static void change() throws IOException 
+	public static void change() throws IOException, NoSuchAlgorithmException 
 	{
-		
-		 String str[] = new String[7];
-		try {
-			File file = new File("C:\\\\Users\\\\Yosoro\\\\OneDrive\\\\桌面\\\\test.txt");
-			Scanner scanner = new Scanner(file);
-			int num=0;
-			while (scanner.hasNext()) 
-	         {
-	              
-	              str[num] = scanner.next();		//字串分割 存入陣列
-	              num++;
-	              
-	         }
-				//System.out.println(str[0]+str[1]+str[2]+str[3]);
-				String ret[]=new String[7];
-				String a[]=new String[7];
-				try {
-					MessageDigest md = MessageDigest.getInstance("MD5");
-					for (int j=0;j<num;j++)
-					{md.update(str[j].getBytes());
-					ret[j] = new BigInteger(1, md.digest()).toString(16);
-					 a[j]=ret[j].substring(12, 18);
-					 //System.out.println(a[j]);
-					 }
-					
-				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				long q[]=new long[7];
-					for(int k=0;k<num;k++) {
-					q[k]=transDec2(a[k]);
-					//System.out.println(q[k]);
-					}
-				//File file1 = new File("C:\\\\Users\\\\Yosoro\\\\OneDrive\\\\桌面\\\\test1.txt");
-				FileWriter fw=new FileWriter("C:\\\\\\\\Users\\\\\\\\Yosoro\\\\\\\\OneDrive\\\\\\\\桌面\\\\\\\\test.txt");
-				String write_to[]=new String[7];
-				String temp[]=new String[7];
-				for(int n=0;n<num;n++) {
-					temp[n]=Long.toString(q[n]);
-				}
-				for(int i=0;i<num;i++) {
-					write_to[i]=temp[i];
-					fw.write(temp[i]+"\n");
-				}
-				fw.close();
-
+		String s1[]=new String[7];
+		String s2[]=new String[7];
+  	    try {
+  	      Connection connect = DriverManager.getConnection(
+  	          "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC","root","123456");
+  	           //連線URL為   jdbc:mysql//伺服器地址/資料庫名  ，後面的2個引數分別是登陸使用者名稱和密碼
+  	      //System.out.println("Success connect Mysql server!");
+  	      Statement stmt = connect.createStatement();
+  	      ResultSet rs = stmt.executeQuery("select * from user");
+  	               
+  	     //user 為你表的名稱
+  	      String aa="";
+  	      int k=0;
+  	      while (rs.next()) {
+  	        //System.out.println(rs.getString("password"));
+  	        s1[k]=rs.getString("password");
+  	        k++;
+  	      }
+  	    MessageDigest md1 = MessageDigest.getInstance("MD5");
+    	  for(int j=0;j<4;j++) {
+    		  String temp="";
+    		  temp=s1[j];
+    		  String temp2="";
+    		md1.update(temp.getBytes());
+    		temp2=new BigInteger(1, md1.digest()).toString(16);
+    		  s2[j]=temp2.substring(8, 24);
+    	  }
+    	  for(int q=0;q<4;q++) {
+    	  String sql="UPDATE user set password=('"+s2[q]+"') WHERE password=('"+s1[q]+"')";
+    	  int result=stmt.executeUpdate(sql);
+    	  
+    	  }
+    	  
+  	    }
+  	    
+  	    catch (Exception e) {
+  	      System.out.print("get data error!");
+  	      e.printStackTrace();
+  	    }
+  	 
 			System.out.println("Done");
 				
 			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		
 	}
