@@ -335,6 +335,13 @@ int port = DEFAULT_PORT+2;
                         y[n]=m.group();
                         n=n+1;
                         }
+                    //System.out.println("y[0]= "+y[0]);
+                    int flag;
+                	flag=decrypted_message.compareTo("over");
+                	 if(flag==0)
+                	{stop = false;
+                	end = false;
+                	break;}
                     int temp=Integer.valueOf(y[0]);
                     if(temp_k==temp) {counter--;}
                     temp_k=temp;
@@ -346,11 +353,7 @@ int port = DEFAULT_PORT+2;
                     System.out.printf("\n");
                     os.println(message);
                 	os.flush(); 
-                	int flag;
-                	flag=message.compareTo("over");
-                	 if(flag==0)
-                	{stop = false;
-                	end = false;}
+                	
                 }}}
                
         catch (IOException e) {

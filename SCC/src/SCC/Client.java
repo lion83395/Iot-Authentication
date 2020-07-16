@@ -117,12 +117,12 @@ public class Client{
             	String sendMessage = DeviceID + "\n";
                 bw.write(sendMessage);
                 bw.flush();
-                System.out.println("DeviceID sent to the server : "+sendMessage);
+                //System.out.println("DeviceID sent to the server : "+sendMessage);
             //Get the return message from the server
          
             BufferedReader br = new BufferedReader(isr);
             String message = br.readLine();
-            System.out.println("c1&challenge received from the server : " +message);
+            //System.out.println("c1&challenge received from the server : " +message);
             
             String regex = "\\d*";
             Pattern p = Pattern.compile(regex);
@@ -182,13 +182,12 @@ public class Client{
 	    
 	     
 	    System.out.println("original message:challenge/sessionkey1/c2/client challenge"+originalString);
-	   // System.out.println("encrypted message: "+encryptedString);
-	    //System.out.println("Session key:"+Sessionkey);
+	   
 	    
 	    bw.write(encryptedString);
         bw.flush();
-        System.out.println("Encrypted Message sent to the server : "+encryptedString);
-            System.out.println("Stop");
+        //System.out.println("Encrypted Message sent to the server : "+encryptedString);
+            //System.out.println("Stop");
             
             
             
@@ -219,18 +218,8 @@ public class Client{
     public static void connect1() throws IOException
     {
         try
-        {	File file = new File("C:\\\\Users\\\\Yosoro\\\\OneDrive\\\\桌面\\\\test.txt");
-		Scanner scanner = new Scanner(file);
-		String str[] = new String[7];
-		int num=0;
-		while (scanner.hasNext()) 
-         {
-              
-              str[num] = scanner.next();		//字串分割 存入陣列
-              num++;
-              
-         }
-        
+        {	
+		
 		int pw1=(int)q[0];
         int pw2=(int)q[1];
         int pw3=(int)q[2];
@@ -275,7 +264,7 @@ public class Client{
   		  final String secretKey1 = output_server;
   		  
   		String decryptedString = AESM.decrypt(message, secretKey1) ;
-  		System.out.println(decryptedString);
+  		//System.out.println(decryptedString);
   			
   		String regex = "\\d*";
         Pattern p = Pattern.compile(regex);
@@ -331,17 +320,23 @@ public class Client{
             String s="";
             System.out.println("After authentication,communication start!");
             int n=4;
+            Random ran=new Random();
+      		
+        	
             while(n!=0){
-            	System.out.println("Message to send");
-            	s=in.nextLine();
+            	
+            	
+            	Thread.sleep(1000);
+            	s=Integer.toString(ran.nextInt(1000));
+            	System.out.println("Message to send:"+s);
             	String temp_n=Integer.toString(n);
                 String sendMessage = temp_n + " "+s+"\n";
                 String encrypted_message=AESM.encrypt(sendMessage, Sessionkey_com)+"\n";
                 bw.write(encrypted_message);
                 bw.flush();
-                //Timestamp d = new Timestamp(System.currentTimeMillis());
+                
                 long d=System.currentTimeMillis();
-                //System.out.println(d);
+                
             
             InputStream is = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
@@ -368,20 +363,21 @@ public class Client{
             y=new String[10];
             //取字串中的數字
             while (m.find()) {
-            if (!"".equals(m.group()))
-            	//System.out.println("come here:" + m.group());
+            if (!"".equals(m.group()))           	
             y[x]=m.group();
             x=x+1;
             }
-            //System.out.println(y[3]);
+           
            
             int temp=Integer.valueOf(y[3]);
             temp=temp-1;
             n=temp;
             System.out.printf("Communication times left: %d",n);
             System.out.printf("\n");
+            String ending=AESM.encrypt("over", Sessionkey_com);
             if(n==0) {
-            	bw.write("over");
+            	
+            	bw.write(ending);
                 bw.flush();
             }
             
@@ -396,7 +392,7 @@ public class Client{
         
         finally
         {
-            //Closing the socket
+            
             try
             {
                 socket.close();
@@ -418,7 +414,7 @@ public class Client{
     	System.out.println("程式執行時間：" +(endTime-startTime)+"ms"); 
     	int ses1=Integer.valueOf(SessionKey);
     	int ses2=Integer.valueOf(SessionKey2);
-    	System.out.println("ses1: "+SessionKey+" ses2: "+SessionKey2);
+    	//System.out.println("ses1: "+SessionKey+" ses2: "+SessionKey2);
     	int com_sessionkey=ses1|ses2;
     	
     	int quotient1 = 0;//商數
