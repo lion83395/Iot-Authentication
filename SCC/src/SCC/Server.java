@@ -2,6 +2,7 @@ package SCC;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -24,7 +25,7 @@ public class Server {
     public static String SessionKey2;
     public static int legal_flag;
     public static String Sessionkey_com;
-    public static int counter;
+    public static int counter=0;
     public static long q[]=new long[7];
     private static long transDec2(String in) {
 	    try {
@@ -36,7 +37,7 @@ public class Server {
 	}
     public static void database() {
     	try {
-  	      Class.forName("com.mysql.jdbc.Driver");     //載入MYSQL JDBC驅動程式   
+  	      Class.forName("com.mysql.cj.jdbc.Driver");     //載入MYSQL JDBC驅動程式   
   	      //Class.forName("org.gjt.mm.mysql.Driver");     System.out.println("Success loading Mysql Driver!");
   	    }
   	    catch (Exception e) {
@@ -91,7 +92,7 @@ public class Server {
         }
         */
         ServerSocket serverSocket = null;
-
+        
         try {
             serverSocket = new ServerSocket(port);
             
@@ -99,26 +100,42 @@ public class Server {
             int pw2=(int)q[1];
             int pw3=(int)q[2];
             int pw4=(int)q[3];
+            
             int[] pw= {0,pw1,pw2,pw3,pw4};
             Socket newSock    = null;
             Boolean stop = true;
             Boolean end = true;
             while(stop == true) { 
-                System.out.println("Server TCP ready at the port: " + port + "..." );
+                //System.out.println("Server TCP ready at the port: " + port + "..." );
 
                 //Waiting for the connection with the client
                 newSock = serverSocket.accept(); 
-                System.out.println("accept");
+                //System.out.println("accept");
                 while(end == true){
                 System.out.println("success connect");
                 BufferedReader is = new BufferedReader(new InputStreamReader(newSock.getInputStream()));
                 PrintWriter os = new PrintWriter(newSock.getOutputStream(), true); 
                 String inputLine = is.readLine(); 
                 System.out.println("Received DeviceID: " + inputLine);
-                int flag;
-                flag=inputLine.compareTo(legaldeviceID);
+                FileReader fr = new FileReader("C:\\Users\\Yosoro\\OneDrive\\桌面\\DeviceList.txt");
+        		
+		        BufferedReader br = new BufferedReader(fr);
+		        String s11;
+		        int flag0=0;
+		        while (br.ready()) {
+	
+		           // System.out.println(br.readLine());
+		            s11=br.readLine();
+		            flag0=s11.compareTo(inputLine);
+		            if(flag0==0) {
+		            	System.out.println("Compared");break;}
+		       }
+		
+		        fr.close();
+                int flag=flag0;
+              //  flag=inputLine.compareTo(legaldeviceID);
                 if(flag==0) {
-                	System.out.println("legal Device");
+                	System.out.println("Legal Device");
                 	Scanner in = new Scanner(System.in);
                 	Random ran=new Random();
                 	String random_number=Integer.toString(ran.nextInt(100));
@@ -128,13 +145,14 @@ public class Server {
                 	String random_key=Integer.toString(ran.nextInt(4)+1);
                 	String random_key1=Integer.toString(ran.nextInt(4)+1);
                     //System.out.println("Response a Challenge");
+                	System.out.println("c1={"+random_key+","+random_key1+"} "+"r1= "+random_number);
                     String s="";
                     int c1=Integer.valueOf(random_key);
                     int c2=Integer.valueOf(random_key1);
                     s=s+random_key+" "+random_key1;
                     //s = in.nextLine();
                     String sendMessage = s+" "+"("+random_number+")";
-                    System.out.println("pair of number and challenge: "+sendMessage);
+                    //System.out.println("pair of number and challenge: "+sendMessage);
                     os.println(sendMessage);
                     //os.println(inputLine.toUpperCase());	
                     os.flush(); 
@@ -163,7 +181,7 @@ public class Server {
             		  }
             		  final String secretKey = output;
             		  String decryptedString = AESM.decrypt(inputLine1, secretKey) ;
-            		  System.out.println("decyrpted message: "+decryptedString);
+            		  //System.out.println("decyrpted message: "+decryptedString);
             		  //check
             		  String regex = "\\d*";
                       Pattern p = Pattern.compile(regex);
@@ -181,6 +199,7 @@ public class Server {
                           n=n+1;
                           }
                       Sessionkey1=y[2];
+                      System.out.println("Decrypted message from device : r1="+y[0]+" t2="+y[2]+" c2={"+y[4]+","+y[6]+"} r2= "+y[8]);
                       int response_int=Integer.valueOf(y[0]);
                       if(response_int==challenge_int) {System.out.println("Correct challenge&response");}
                       else {
@@ -188,7 +207,9 @@ public class Server {
                       int legal_flag=1;
                       int a=Integer.valueOf(y[4]);
                       int b=Integer.valueOf(y[6]);                      
+                      
                       int temp=pw[a]|pw[b];
+                      
                       int key_server=temp|key1_temp;
                       int quotient1 = 0;//商數
             		  String output_server = " "; 
@@ -212,9 +233,9 @@ public class Server {
             		  String originalString = y[8]+" "+Sessionkey;
             		  SessionKey2=Sessionkey;
             		  String encryptedString = AESM.encrypt(originalString, secretKey1) ;
-            		  String decryptedString1 = AESM.decrypt(encryptedString, secretKey1) ;
-            		  System.out.println("message send to client:challenge from client "+originalString);
-            		  System.out.println("encyrpted message: "+encryptedString);
+            		  //String decryptedString1 = AESM.decrypt(encryptedString, secretKey1) ;
+            		  System.out.println("Send to client:r2="+y[8]+" t1= "+SessionKey2);
+            		  System.out.println("Encyrpted message: "+encryptedString);
             		  message_to_send=encryptedString;
             		  legal_flag=1;
             		  
@@ -311,15 +332,15 @@ int port = DEFAULT_PORT+2;
                 //Waiting for the connection with the client
                 newSock = serverSocket.accept(); 
                 while(end == true){
-                	System.out.println("success connect");
+                	//System.out.println("success connect");
                     BufferedReader is = new BufferedReader(new InputStreamReader(newSock.getInputStream()));
                     PrintWriter os = new PrintWriter(newSock.getOutputStream(), true); 
                     String inputLine = is.readLine(); 
                   //  System.out.println("Received message: " + inputLine);
                    // String decrypted_message=AESM.decrypt(inputLine,Sessionkey_com);
-                    System.out.println(inputLine);
+                    System.out.println("Receive encrypted message:"+inputLine);
                     String decrypted_message=AESM.decrypt(inputLine, Sessionkey_com);
-                    System.out.println(decrypted_message);
+                    System.out.println("Decrypted message:"+decrypted_message);
                     String regex = "\\d*";
                     Pattern p = Pattern.compile(regex);
                     int n=0;
@@ -337,10 +358,11 @@ int port = DEFAULT_PORT+2;
                         }
                     //System.out.println("y[0]= "+y[0]);
                     int flag;
-                	flag=decrypted_message.compareTo("over");
+                	flag=decrypted_message.compareTo("Session end");
                 	 if(flag==0)
                 	{stop = false;
                 	end = false;
+                	newSock.close();
                 	break;}
                     int temp=Integer.valueOf(y[0]);
                     if(temp_k==temp) {counter--;}
@@ -361,17 +383,18 @@ int port = DEFAULT_PORT+2;
         }
     	
 }
+    
     // end main
     public static void main(String[] args) throws IOException{
     	database();
     	connecting();
     	connecting1();
-    	System.out.println("sessionkey1: "+Sessionkey1+" Sessionkey2: "+SessionKey2);
+    	//System.out.println("sessionkey1: "+Sessionkey1+" Sessionkey2: "+SessionKey2);
     	System.out.println("Authentication done");
     	System.out.println("===============================");
     	int ses1=Integer.valueOf(Sessionkey1);
     	int ses2=Integer.valueOf(SessionKey2);
-    	System.out.println("ses1: "+Sessionkey1+" ses2: "+SessionKey2);
+    	//System.out.println("ses1: "+Sessionkey1+" ses2: "+SessionKey2);
     	int com_sessionkey=ses1|ses2;
     	int quotient1 = 0;//商數
 		  String output_server = " "; 
@@ -396,6 +419,43 @@ int port = DEFAULT_PORT+2;
     		connect2();
     		System.out.println("Session end");
     		System.out.println("===============================");
-    	
+    		if(counter==0) {int port = DEFAULT_PORT+5;
+	        
+	        
+	        
+	        ServerSocket serverSocket = null;
+
+	        try {
+	            serverSocket = new ServerSocket(port);            
+	            Socket newSock  = null;
+	            Boolean stop = true;
+	            Boolean end = true;
+	            while(stop == true) { 
+	            	//System.out.println("Server TCP ready at the port: " + port + "..." );
+	            	System.out.println("Waiting for test message...");
+	                //Waiting for the connection with the client
+	                newSock = serverSocket.accept(); 
+	                while(end == true){
+	                	//System.out.println("success connect");
+	                    BufferedReader is = new BufferedReader(new InputStreamReader(newSock.getInputStream()));
+	                    PrintWriter os = new PrintWriter(newSock.getOutputStream(), true); 
+	                    //String inputLine = is.readLine(); 
+	                    System.out.println("Received message: Environment test");
+
+	                    os.println("Environment is ok");
+	                	os.flush(); 
+	                	stop=false;
+	                	end=false;
+	                	newSock.close();
+	                	
+	                }}}
+	               
+	        catch (IOException e) {
+	            System.err.println("Error2 " + e);
+	        }
+            
+    		}
+    		else {System.out.println("ready for next authentication");}
     }
+    
 }

@@ -32,7 +32,7 @@ public class Client{
     public static String clientchallenge;
     public static int legal_flag;
     public static String Sessionkey_com;
-    public static int counter=3;
+    public static int counter=0;
     public static long q[]=new long[7];
     private static long transDec2(String in) {
 	    try {
@@ -44,7 +44,7 @@ public class Client{
 	}
     public static void database() {
     	try {
-  	      Class.forName("com.mysql.jdbc.Driver");     //載入MYSQL JDBC驅動程式   
+  	      Class.forName("com.mysql.cj.jdbc.Driver");     //載入MYSQL JDBC驅動程式   
   	      //Class.forName("org.gjt.mm.mysql.Driver");     System.out.println("Success loading Mysql Driver!");
   	    }
   	    catch (Exception e) {
@@ -73,10 +73,7 @@ public class Client{
   	    for (int j=0;j<num;j++) {
   	    	q[j]=transDec2(temp[j]); 	    	
   	    }
-  	    
-  	    
-  	    
-  	    
+
   	    }
   	    	
   	     catch (Exception e) {
@@ -147,7 +144,7 @@ public class Client{
             client_key=key;            
             int quotient = 0;//商數
   		  String output = " "; 
-  		  
+  		  System.out.println("Initial received from server:c1={"+a+","+b+"} r1="+y[5]);
   		  //計算結果
   		  for(int n1 = 1; n1 <= 4; n1++ )//計算每四個字元要空白
   		  {
@@ -179,14 +176,14 @@ public class Client{
 	    //加密
 	    String originalString = y[5]+" "+Sessionkey+" "+random_key+" "+random_key1+" "+Client_challenge;
 	    String encryptedString = AESM.encrypt(originalString, secretKey) ;
-	    
+	    System.out.println("Original message send to Server: r2="+Client_challenge+" t2="+Sessionkey+" c2={"+random_key+","+random_key1+"} r1="+y[5]);
 	     
-	    System.out.println("original message:challenge/sessionkey1/c2/client challenge"+originalString);
+	    //System.out.println("original message:challenge/sessionkey1/c2/client challenge"+originalString);
 	   
 	    
 	    bw.write(encryptedString);
         bw.flush();
-        //System.out.println("Encrypted Message sent to the server : "+encryptedString);
+        System.out.println("Encrypted Message sent to the server : "+encryptedString);
             //System.out.println("Stop");
             
             
@@ -278,6 +275,7 @@ public class Client{
         y[n]=m.group();
         n=n+1;
         }
+        System.out.println("Decrypted message: r2="+clientchallenge+" t2= "+y[2]);
         int a=Integer.valueOf(clientchallenge);
         int b=Integer.valueOf(y[0]);
         SessionKey2=y[2];
@@ -319,7 +317,7 @@ public class Client{
             Scanner in = new Scanner(System.in);
             String s="";
             System.out.println("After authentication,communication start!");
-            int n=4;
+            int n=10;
             Random ran=new Random();
       		
         	
@@ -353,7 +351,7 @@ public class Client{
             
             
             String decrypted_message=AESM.decrypt(message, Sessionkey_com);
-            System.out.println(decrypted_message);
+            System.out.println("Decrypted message:"+decrypted_message);
             String regex = "\\d*";
             Pattern p = Pattern.compile(regex);
             int x=0;
@@ -374,7 +372,7 @@ public class Client{
             n=temp;
             System.out.printf("Communication times left: %d",n);
             System.out.printf("\n");
-            String ending=AESM.encrypt("over", Sessionkey_com);
+            String ending=AESM.encrypt("Session end", Sessionkey_com);
             if(n==0) {
             	
             	bw.write(ending);
@@ -405,13 +403,13 @@ public class Client{
 
     	}
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException{
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException{
     	database();
     	long startTime=System.currentTimeMillis(); 
     	connect();
     	connect1();
     	long endTime=System.currentTimeMillis(); 
-    	System.out.println("程式執行時間：" +(endTime-startTime)+"ms"); 
+    	System.out.println("Authentication time：" +(endTime-startTime)+"ms"); 
     	int ses1=Integer.valueOf(SessionKey);
     	int ses2=Integer.valueOf(SessionKey2);
     	//System.out.println("ses1: "+SessionKey+" ses2: "+SessionKey2);
@@ -439,19 +437,57 @@ public class Client{
     	
     	if(legal_flag==1)
     	{System.out.println("Authentication ok");
-    	System.out.println("===============================");
-    		
+    	System.out.println("===============================");   		
     	}
+    	long startTime1=System.currentTimeMillis(); 
     	connect2();
+    	long endTime1=System.currentTimeMillis(); 
+    	System.out.println("Communication time ：" +(endTime1-startTime1)+"ms"); 
+    	System.out.println("OK,Session end");
     	System.out.println("session end");
     	System.out.println("===============================");
     	if(counter!=0) {
+    		System.out.print("Counter="+counter+"\n");
     		AES.change();
     		System.out.println("Change complete");
     	}
     	else {
+    		Boolean end=true;
+    		while(end ==true){
+
+    		System.out.print("Counter="+counter+"\n");
     		System.out.println("Do not change");
+    		Thread.sleep(3000);
+    		System.out.println("Wait for 3 second..");
+    		String host = "localhost";
+            int port = 5035;
+            InetAddress address = InetAddress.getByName(host);
+            socket = new Socket(address, port);
+            OutputStream os = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os);
+            BufferedWriter bw = new BufferedWriter(osw);
+            String s1="Environment test";
+           // System.out.println(s1);
+            bw.write(s1);
+            bw.flush();
+            long startTime2=System.currentTimeMillis(); 
+            InputStream is = socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            String s;
+            s=br.readLine();
+            System.out.println(s);
+            long endTime2=System.currentTimeMillis();
+            if((startTime2-endTime2)<3000) {
+            	System.out.println("Ok,Authentication again");
+            	end=false;
+            	break;}
+            }
+    		
     	}
+    		
+    	
     	
     }
+	
 }
