@@ -18,7 +18,7 @@ import java.math.*;
 
 
 
-public class AES {
+public class Keymanager {
 	private static long transDec2(String in) {
 	    try {
 	        long out = Long.valueOf(in,16).intValue();

@@ -448,7 +448,7 @@ public class Client{
     	System.out.println("===============================");
     	if(counter!=0) {
     		System.out.print("Counter="+counter+"\n");
-    		AES.change();
+    		Keymanager.change();
     		System.out.println("Change complete");
     	}
     	else {
