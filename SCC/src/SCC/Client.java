@@ -22,7 +22,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 public class Client{
- 
+  
     private static Socket socket;
     public static String SessionKey;
     public static String SessionKey2;
