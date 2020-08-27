@@ -117,7 +117,7 @@ public class Server {
                 PrintWriter os = new PrintWriter(newSock.getOutputStream(), true); 
                 String inputLine = is.readLine(); 
                 System.out.println("Received DeviceID: " + inputLine);
-                FileReader fr = new FileReader("C:\\Users\\Yosoro\\OneDrive\\桌面\\DeviceList.txt");
+                FileReader fr = new FileReader("C:\\Users\\Yosoro\\eclipse-workspace\\SCC\\src\\SCC\\DeviceList.txt");
         		
 		        BufferedReader br = new BufferedReader(fr);
 		        String s11;
