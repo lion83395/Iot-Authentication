@@ -67,7 +67,7 @@ public class Client{
   	        num++;
   	      }
   	    for(int i=0;i<num;i++) {
-	    		temp[i]=key[i].substring(8,12);
+	    		temp[i]=key[i].substring(8,12);//從資料庫中取其中片段
 	    	}
   	    
   	    for (int j=0;j<num;j++) {
@@ -135,7 +135,7 @@ public class Client{
             y[n]=m.group();
             n=n+1;
             }
-            //把數字or完後二元化成16位元數字
+            //把數字加完後二元化成16位元數字
             String a=y[0];
             String b=y[2];
             int i = Integer.valueOf(a);
